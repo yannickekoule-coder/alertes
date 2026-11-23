@@ -17,7 +17,7 @@ Aperçu en ligne : [https://yannickekoule-coder.github.io/alertes/](https://yann
 
 ## Effet
 
-Au chargement, un globe filaire apparaît dans une lentille cyan (anneau, graduations, arcs), puis s’ouvre en planisphère incliné : frontières en traits blancs/cyan lumineux, terres en points, halos de couleur selon la gravité (vert = info, ambre = vigilance, rouge = danger) et anneaux radar. Les panneaux HUD montrent le fil d’alertes, les compteurs, les sources et la chronologie du jour (heure de Paris). Un clic ou un appui sur un pays rapproche la caméra et affiche ses cartes. Sur téléphone, les panneaux deviennent un tiroir bas. Si WebGL manque, une carte 2D prend le relais. Les animations se calment automatiquement si le système demande `prefers-reduced-motion`.
+Au chargement, un globe filaire apparaît dans une lentille cyan (anneau, graduations, arcs). Le globe reste en 3D et tourne seul (un tour en 60 secondes, comme dans Cerveau virtuel) : on le glisse dans tous les sens, on pince ou on utilise la molette pour zoomer. Atmosphère cyan lumineuse, frontières blanc/cyan, terres en points, halos selon la gravité (vert = info, ambre = vigilance, rouge = danger) et anneaux radar. Un clic sur un pays ou une carte d’alerte fait voler la caméra jusqu’au pays : les villes principales apparaissent en tours 3D (hauteur selon la population, données GeoNames), avec un bouton « Retour au globe ». Les panneaux HUD montrent le fil d’alertes, les compteurs, les sources et la chronologie du jour (heure de Paris). Un clic ou un appui sur un pays rapproche la caméra et affiche ses cartes. Sur téléphone, les panneaux deviennent un tiroir bas. Si WebGL manque, une carte 2D prend le relais. Les animations se calment automatiquement si le système demande `prefers-reduced-motion`.
 
 Ajouter `?shot=1` à l’adresse saute l’intro (utile pour une capture).
 
@@ -42,3 +42,5 @@ Fichiers principaux uniquement, sans les bibliothèques tierces ni les données 
 - `js/alertes.js`
 - `README.md`
 - `assets/favicon.svg`
+- `data/iso.json`
+- `data/cities.json` (extrait des villes, utile)

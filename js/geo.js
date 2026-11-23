@@ -32,6 +32,7 @@
   let iso = { num: {}, a3: {}, names: {} };
   let features = [];
   let landFeature = null;
+  let citiesByIso = {};
   let display; // Intl.DisplayNames
 
   function sph(lon, lat, r) {
@@ -217,6 +218,15 @@
     return features.find((f) => f.iso2 === iso2) || null;
   }
 
+  function loadCities(data) {
+    citiesByIso = data || {};
+  }
+
+  function citiesFor(iso2) {
+    return (iso2 && citiesByIso[iso2]) || [];
+  }
+
+
   function sampleLandDots(step) {
     const s = step || 2.2;
     const pts = [];
@@ -276,7 +286,7 @@
   global.ALERTES = global.ALERTES || {};
   global.ALERTES.geo = {
     R_GLOBE, PLAN, sph, pla, mix,
-    loadIso, loadTopology, locate, findByIso2,
+    loadIso, loadTopology, locate, findByIso2, loadCities, citiesFor,
     countryName, iso2OfAlpha3, iso2OfNumeric,
     sampleLandDots, borderRings,
     features: () => features,
