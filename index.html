@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#030508">
+  <meta name="color-scheme" content="dark">
+  <title>ALERTES — veilles du jour</title>
+  <meta name="description" content="Planisphère des alertes du jour : séismes, cyclones, inondations et autres événements issus de sources publiques.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/alertes.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene" aria-label="Carte mondiale des alertes"></canvas>
+    <div id="map2d" hidden aria-hidden="true"></div>
+
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="hud-frame" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <h1>ALERTES</h1>
+          <p class="tag">Planisphère des veilles du jour</p>
+        </div>
+      </div>
+      <div class="clock" id="clock">
+        <div class="clock-date" id="clock-date">—</div>
+        <div class="clock-time" id="clock-time">--:--:--</div>
+        <div class="clock-zone">Europe/Paris</div>
+      </div>
+    </header>
+
+    <aside class="panel panel-left" id="panel-left">
+      <div class="counters" id="counters">
+        <div class="counter"><strong id="count-total">—</strong><span>Alertes</span></div>
+        <div class="counter"><strong id="count-countries">—</strong><span>Pays</span></div>
+        <div class="counter sev-danger"><strong id="count-danger">—</strong><span>Danger</span></div>
+        <div class="counter sev-watch"><strong id="count-watch">—</strong><span>Vigilance</span></div>
+      </div>
+      <div class="panel-head">
+        <h2>Fil en direct</h2>
+        <span class="live-dot" aria-hidden="true"></span>
+      </div>
+      <div class="feed" id="feed" role="list"></div>
+    </aside>
+
+    <aside class="panel panel-right" id="panel-right">
+      <section>
+        <h2>Sources</h2>
+        <ul class="sources" id="sources"></ul>
+      </section>
+      <section>
+        <h2>Catégories</h2>
+        <div class="cats" id="cats"></div>
+      </section>
+      <section>
+        <h2>Chronologie du jour</h2>
+        <p class="tiny">Heure de Paris, par tranche de 3 heures</p>
+        <div class="timeline" id="timeline"></div>
+      </section>
+    </aside>
+
+    <div class="country-pop" id="country-pop" hidden>
+      <button type="button" class="pop-close" id="pop-close" aria-label="Fermer">✕</button>
+      <div id="country-pop-body"></div>
+    </div>
+
+    <div class="sheet" id="sheet">
+      <button type="button" class="sheet-handle" id="sheet-handle" aria-expanded="false" aria-controls="sheet-body">
+        <span class="handle-bar" aria-hidden="true"></span>
+        <span id="sheet-title">Fil d'alertes</span>
+      </button>
+      <div class="sheet-body" id="sheet-body">
+        <div class="sheet-tabs">
+          <button type="button" class="tab is-on" data-tab="feed">Fil</button>
+          <button type="button" class="tab" data-tab="stats">Bilans</button>
+        </div>
+        <div class="sheet-panel is-on" data-panel="feed" id="sheet-feed"></div>
+        <div class="sheet-panel" data-panel="stats" id="sheet-stats"></div>
+      </div>
+    </div>
+
+    <p class="legend" id="legend">
+      <span class="lg lg-info">Info</span>
+      <span class="lg lg-watch">Vigilance</span>
+      <span class="lg lg-danger">Danger</span>
+      <span class="hint">Toucher un pays pour zoomer</span>
+    </p>
+
+    <button type="button" class="skip" id="skip">Passer l'intro</button>
+    <div class="load-status" id="load-status">Synchronisation des alertes…</div>
+  </div>
+
+  <script src="vendor/three.r159.min.js"></script>
+  <script src="vendor/topojson-client.min.js"></script>
+  <script src="js/geo.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/alertes.js"></script>
+</body>
+</html>
