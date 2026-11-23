@@ -555,17 +555,30 @@
   }
 
   /* ---------- HUD ---------- */
+  function mapsHref(a) {
+    if (!isFinite(a.lat) || !isFinite(a.lon)) return "";
+    const fn = window.ALERTES.mapview && window.ALERTES.mapview.mapsUrl;
+    return fn ? fn(a.lat, a.lon) : ("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.lat + "," + a.lon));
+  }
+
   function cardHTML(a) {
     const sev = a.severity || "info";
+    const href = mapsHref(a);
+    const link = href
+      ? '<a class="gmaps" href="' + href + '" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Maps</a>'
+      : "";
     return (
-      '<button type="button" class="card sev-' + sev + '" data-id="' + a.id + '" data-iso="' + a.iso2 + '" role="listitem">' +
-        '<span class="card-icon" aria-hidden="true">' + (a.icon || "•") + "</span>" +
-        "<div>" +
-          '<p class="card-kicker">' + (a.typeLabel || "") + " · " + (sev === "danger" ? "Danger" : sev === "watch" ? "Vigilance" : "Info") + "</p>" +
-          '<p class="card-title">' + escapeHtml(a.title) + "</p>" +
-          '<p class="card-meta">' + escapeHtml(a.countryName || "") + (a.extra ? " · " + escapeHtml(a.extra) : "") + (a.time ? " · " + fmtWhen(a.time) : "") + "</p>" +
-        "</div>" +
-      "</button>"
+      '<div class="card sev-' + sev + '" role="listitem">' +
+        '<button type="button" class="card-main" data-id="' + a.id + '" data-iso="' + a.iso2 + '">' +
+          '<span class="card-icon" aria-hidden="true">' + (a.icon || "•") + "</span>" +
+          "<div>" +
+            '<p class="card-kicker">' + (a.typeLabel || "") + " · " + (sev === "danger" ? "Danger" : sev === "watch" ? "Vigilance" : "Info") + "</p>" +
+            '<p class="card-title">' + escapeHtml(a.title) + "</p>" +
+            '<p class="card-meta">' + escapeHtml(a.countryName || "") + (a.extra ? " · " + escapeHtml(a.extra) : "") + (a.time ? " · " + fmtWhen(a.time) : "") + "</p>" +
+            link +
+          "</div>" +
+        "</button>" +
+      "</div>"
     );
   }
 
@@ -670,7 +683,7 @@
   }
 
   function bindCardClicks(root) {
-    root.querySelectorAll(".card[data-iso]").forEach((btn) => {
+    root.querySelectorAll(".card-main[data-iso], .card[data-iso]").forEach((btn) => {
       btn.addEventListener("click", () => selectCountry(btn.getAttribute("data-iso"), btn.getAttribute("data-id")));
     });
   }
@@ -704,7 +717,31 @@
         state.lon = target.lon; state.lat = target.lat; state.dist = target.dist;
       }
     }
-    if (fallback2d) { /* redraw in loop */ }
+    const goMap = () => openRealMap(iso2, alertId);
+    if (!list.length) {
+      if (window.ALERTES.mapview) window.ALERTES.mapview.hide();
+    } else if (!state.fly || reduced) {
+      goMap();
+    } else {
+      state.onFlyEnd = goMap;
+    }
+  }
+
+  function openRealMap(iso2, alertId) {
+    const pack = state.countries[iso2];
+    const list = ((pack && pack.alerts) || state.alerts.filter((a) => a.iso2 === iso2)).filter((a) => isFinite(a.lon) && isFinite(a.lat));
+    if (!list.length || !window.ALERTES.mapview) return;
+    const chosen = (alertId && list.find((a) => a.id === alertId)) || list[0];
+    const cities = geo.citiesFor(iso2).map((c) => {
+      const near = list.some((a) => Math.abs(a.lat - c.lat) < 0.8 && Math.abs(a.lon - c.lon) < 0.8);
+      return near ? Object.assign({}, c, { alert: true }) : c;
+    });
+    window.ALERTES.mapview.show({
+      iso2,
+      alerts: chosen ? [chosen].concat(list.filter((a) => a.id !== chosen.id)) : list,
+      cities,
+      reduced: reduced
+    });
   }
 
   function clearSelection() {
@@ -715,6 +752,8 @@
     const back = $("back-globe");
     if (back) back.hidden = true;
     clearCities();
+    state.onFlyEnd = null;
+    if (window.ALERTES.mapview) window.ALERTES.mapview.hide();
     startFly({ lon: state.lon, lat: clampLat(Math.min(30, Math.max(-10, state.lat))), dist: DIST_HOME, look: { x: 0, y: 0, z: 0 } });
     state.pausedUntil = performance.now() + 1400;
   }
@@ -745,7 +784,7 @@
     let lastMove = { t: 0, dx: 0, dy: 0 };
 
     function onDown(e) {
-      if (e.target.closest && e.target.closest(".panel, .sheet, .country-pop, .skip, .back-globe, button, a")) return;
+      if (e.target.closest && e.target.closest(".panel, .sheet, .country-pop, .skip, .back-globe, #realmap, button, a")) return;
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       lastX = e.clientX; lastY = e.clientY; moving = false;
       state.dragging = true;
@@ -795,7 +834,7 @@
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onUp);
     window.addEventListener("wheel", (e) => {
-      if (e.target.closest && e.target.closest(".panel, .sheet, .country-pop")) return;
+      if (e.target.closest && e.target.closest(".panel, .sheet, .country-pop, #realmap")) return;
       e.preventDefault();
       const d = Math.exp(e.deltaY * 0.0014);
       state.dist = clampDist(state.dist * d);
@@ -989,6 +1028,7 @@
       state.dist = f.to.dist;
       state.look = f.to.look;
       state.fly = null;
+      if (state.onFlyEnd) { const fn = state.onFlyEnd; state.onFlyEnd = null; fn(); }
     }
   }
 
@@ -1112,6 +1152,7 @@
     state.ready = true;
     window.__ALERTES_READY = true;
     window.__ALERTES_FOCUS = (iso) => selectCountry(String(iso || "").toUpperCase());
+    window.__ALERTES_MAP_ON = () => !!(window.ALERTES.mapview && window.ALERTES.mapview.isVisible());
   }
 
   document.addEventListener("DOMContentLoaded", boot);

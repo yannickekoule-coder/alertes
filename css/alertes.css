@@ -99,13 +99,18 @@ h1 {
 .counter.sev-watch strong { color: var(--amber); }
 
 .feed { display: flex; flex-direction: column; gap: 8px; }
-.card {
+.card-main {
   display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: start;
-  padding: 8px; border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(6,14,22,0.9);
+  padding: 8px; border: 0; background: transparent;
   cursor: pointer; text-align: left; color: inherit; font: inherit; width: 100%;
 }
-.card:hover, .card:focus-visible { border-color: var(--cyan); outline: none; }
+.card {
+  display: block;
+  padding: 0; border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(6,14,22,0.9);
+}
+.card:hover, .card:focus-within { border-color: var(--cyan); outline: none; }
+.card-main:focus-visible { outline: none; }
 .card-icon {
   width: 36px; height: 36px; display: grid; place-items: center;
   border: 1px solid currentColor; font-size: 14px; letter-spacing: 0;
@@ -273,4 +278,86 @@ h1 {
 @media (max-width: 860px) {
   .back-globe { left: 12px; bottom: calc(128px + var(--safe-b)); }
   .city-lab { font-size: 9px; }
+}
+
+#realmap {
+  position: absolute; inset: 0; z-index: 3;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.7s ease, visibility 0.7s;
+  background: #030508;
+}
+#realmap.is-on { opacity: 1; visibility: visible; pointer-events: auto; }
+#realmap-canvas { position: absolute; inset: 0; }
+#realmap .maplibregl-canvas { outline: none; }
+#realmap .maplibregl-ctrl-attrib {
+  font-size: 9px; background: rgba(4,10,16,0.78) !important; color: #8aa0b3;
+  max-width: 52%;
+}
+#realmap .maplibregl-ctrl-attrib a { color: #3ff0ff; }
+#realmap .maplibregl-ctrl-bottom-left { left: 12px; bottom: 12px; }
+#realmap .maplibregl-ctrl-bottom-right { right: 12px; bottom: 12px; }
+
+.map-tools {
+  position: absolute; top: calc(86px + var(--safe-t)); left: 50%;
+  transform: translateX(-50%); z-index: 4;
+  display: flex; gap: 0; border: 1px solid var(--line);
+  background: var(--panel); backdrop-filter: blur(10px);
+}
+.map-tools button {
+  font: inherit; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); background: transparent; border: 0; padding: 7px 12px; cursor: pointer;
+}
+.map-tools button.is-on { color: var(--cyan); background: rgba(63,240,255,0.08); }
+
+.map-pulse {
+  width: 28px; height: 28px; position: relative;
+  --pulse: #3cff7a;
+}
+.map-pulse-core {
+  position: absolute; left: 50%; top: 50%; width: 10px; height: 10px;
+  margin: -5px 0 0 -5px; border-radius: 50%; background: var(--pulse);
+  box-shadow: 0 0 12px var(--pulse), 0 0 24px var(--pulse);
+}
+.map-pulse-ring {
+  position: absolute; left: 50%; top: 50%; width: 10px; height: 10px;
+  margin: -5px 0 0 -5px; border-radius: 50%;
+  border: 2px solid var(--pulse);
+  animation: mapRipple 2.2s ease-out infinite;
+}
+.map-pulse-ring.r2 { animation-delay: 0.7s; }
+@keyframes mapRipple {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(5.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-pulse-ring { animation: none; opacity: 0.5; transform: scale(2.2); }
+}
+
+.map-city-lab {
+  font: 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #e8f4ff; letter-spacing: 0.04em;
+  text-shadow: 0 0 6px #000, 0 1px 2px #000;
+  white-space: nowrap; pointer-events: none;
+}
+.map-city-lab.is-cap { color: var(--cyan); letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; }
+
+.map-pop .maplibregl-popup-content {
+  background: rgba(4,10,16,0.92); color: #e8f4ff; border: 1px solid rgba(63,240,255,0.35);
+  font: 11px ui-monospace, Menlo, Consolas, monospace; padding: 8px 10px; border-radius: 0;
+}
+.map-pop .maplibregl-popup-content a { color: #3ff0ff; }
+.map-pop .maplibregl-popup-tip { border-top-color: rgba(4,10,16,0.92); }
+
+.gmaps {
+  display: inline-block; margin-top: 5px;
+  font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(63,240,255,0.35);
+}
+.gmaps:hover { border-bottom-color: var(--cyan); }
+
+@media (max-width: 860px) {
+  .map-tools { top: calc(76px + var(--safe-t)); }
+  #realmap .maplibregl-ctrl-bottom-left,
+  #realmap .maplibregl-ctrl-bottom-right { bottom: calc(56px + var(--safe-b)); }
+  #realmap .maplibregl-ctrl-attrib { max-width: 70%; }
 }

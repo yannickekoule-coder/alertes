@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-build="v2-globe">
+<html lang="fr" data-build="v3-map">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,12 +8,20 @@
   <title>ALERTES — veilles du jour</title>
   <meta name="description" content="Planisphère des alertes du jour : séismes, cyclones, inondations et autres événements issus de sources publiques.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="vendor/maplibre-gl.css">
   <link rel="stylesheet" href="css/alertes.css">
 </head>
 <body>
   <div id="app">
     <canvas id="scene" aria-label="Carte mondiale des alertes"></canvas>
     <div id="map2d" hidden aria-hidden="true"></div>
+    <div id="realmap" aria-hidden="true">
+      <div id="realmap-canvas"></div>
+      <div class="map-tools" role="group" aria-label="Fond de carte">
+        <button type="button" id="basemap-sat" class="is-on">Satellite</button>
+        <button type="button" id="basemap-osm">Plan</button>
+      </div>
+    </div>
 
     <div class="vignette" aria-hidden="true"></div>
     <div class="hud-frame" aria-hidden="true"></div>
@@ -99,8 +107,10 @@
 
   <script src="vendor/three.r159.min.js"></script>
   <script src="vendor/topojson-client.min.js"></script>
+  <script src="vendor/maplibre-gl.js"></script>
   <script src="js/geo.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/map.js"></script>
   <script src="js/alertes.js"></script>
 </body>
 </html>
