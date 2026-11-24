@@ -246,7 +246,7 @@
         .setPopup(new maplibregl.Popup({ offset: 18, closeButton: true, className: "map-pop" })
           .setHTML(
             "<strong>" + escapeHtml(a.title || a.typeLabel) + "</strong>" +
-            "<p>" + escapeHtml((a.typeLabel || "") + (a.extra ? " · " + a.extra : "")) + "</p>" +
+            "<p>" + escapeHtml((a.typeLabel || "") + (a.sourceLabel ? " · " + a.sourceLabel : "") + (a.extra ? " · " + a.extra : "")) + "</p>" +
             '<p class="map-links">' +
               '<a href="' + mapsUrl(a.lat, a.lon) + '" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Maps</a>' +
               '<a href="' + earthUrl(a.lat, a.lon) + '" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Earth</a>' +
@@ -272,7 +272,7 @@
   function padding() {
     const mobile = window.innerWidth < 860;
     return mobile
-      ? { top: 100, bottom: 360, left: 16, right: 16 }
+      ? { top: 130, bottom: 300, left: 16, right: 16 }
       : { top: 90, bottom: 280, left: 310, right: 310 };
   }
 

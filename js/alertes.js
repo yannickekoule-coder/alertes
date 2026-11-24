@@ -584,7 +584,12 @@
           "<div>" +
             '<p class="card-kicker">' + (a.typeLabel || "") + " · " + (sev === "danger" ? "Danger" : sev === "watch" ? "Vigilance" : "Info") + "</p>" +
             '<p class="card-title">' + escapeHtml(a.title) + "</p>" +
-            '<p class="card-meta">' + escapeHtml(a.countryName || "") + (a.extra ? " · " + escapeHtml(a.extra) : "") + (a.time ? " · " + fmtWhen(a.time) : "") + "</p>" +
+            '<p class="card-meta">' +
+              escapeHtml(a.countryName || "") +
+              (a.sourceLabel ? " · " + escapeHtml(a.sourceLabel) : "") +
+              (a.extra ? " · " + escapeHtml(a.extra) : "") +
+              (a.time ? " · " + fmtWhen(a.time) : "") +
+            "</p>" +
           "</div>" +
         "</button>" +
         links +
@@ -669,15 +674,36 @@
     return Date.parse(day + "T00:00:00+01:00");
   }
 
+  function isMobile() {
+    return window.innerWidth < 860;
+  }
+
+  function setSheetOpen(open) {
+    const sheet = $("sheet");
+    if (!sheet) return;
+    sheet.classList.toggle("is-open", !!open);
+    const handle = $("sheet-handle");
+    if (handle) handle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
   function renderCounters() {
     const alerts = state.alerts;
     const danger = alerts.filter((a) => a.severity === "danger").length;
     const watch = alerts.filter((a) => a.severity === "watch").length;
     const countries = Object.keys(state.countries).filter((k) => k !== "XX").length;
-    $("count-total").textContent = String(alerts.length);
-    $("count-countries").textContent = String(countries);
-    $("count-danger").textContent = String(danger);
-    $("count-watch").textContent = String(watch);
+    const set = (id, v) => { const el = $(id); if (el) el.textContent = String(v); };
+    set("count-total", alerts.length);
+    set("count-countries", countries);
+    set("count-danger", danger);
+    set("count-watch", watch);
+    const host = $("sheet-counters");
+    if (host) {
+      host.innerHTML =
+        '<div class="counter"><strong>' + alerts.length + "</strong><span>Alertes</span></div>" +
+        '<div class="counter"><strong>' + countries + "</strong><span>Pays</span></div>" +
+        '<div class="counter sev-danger"><strong>' + danger + "</strong><span>Danger</span></div>" +
+        '<div class="counter sev-watch"><strong>' + watch + "</strong><span>Vigilance</span></div>";
+    }
   }
 
   function renderAllHUD() {
@@ -709,14 +735,21 @@
     const body = $("country-pop-body");
     const name = (pack && pack.name) || geo.countryName(iso2);
     const list = pack ? pack.alerts : state.alerts.filter((a) => a.iso2 === iso2);
-    const nCities = geo.citiesFor(iso2).length;
+    const cities = geo.citiesFor(iso2).slice().sort((x, y) => (y.pop || 0) - (x.pop || 0));
+    const nCities = cities.length;
+    const shown = cities.slice(0, 16);
+    const cityLine = shown.length
+      ? "<p class='tiny'>" + nCities + " ville" + (nCities > 1 ? "s" : "") + " principales — vue 3D au sol (relief et bâtiments)</p>" +
+        "<p class='city-list'>" + shown.map((c) => escapeHtml(c.n)).join(" · ") + (nCities > shown.length ? " · …" : "") + "</p>"
+      : "";
     body.innerHTML = "<h3>" + escapeHtml(name) + "</h3>" +
-      (nCities ? "<p class='tiny'>" + nCities + " ville" + (nCities > 1 ? "s" : "") + " principales — vue 3D au sol (relief et bâtiments)</p>" : "") +
+      cityLine +
       (list.length ? "<div class='pop-feed'>" + list.map(cardHTML).join("") + "</div>"
         : "<p class='tiny'>Aucune alerte recensée pour ce pays aujourd'hui.</p>");
     pop.hidden = false;
     const back = $("back-globe");
     if (back) back.hidden = false;
+    if (isMobile()) setSheetOpen(false);
     bindCardClicks(body);
     const target = focusTarget(iso2, alertId);
     if (state.webgl) {
@@ -764,6 +797,7 @@
     clearCities();
     state.onFlyEnd = null;
     if (window.ALERTES.mapview) window.ALERTES.mapview.hide();
+    if (isMobile()) setSheetOpen(true);
     startFly({ lon: state.lon, lat: clampLat(Math.min(30, Math.max(-10, state.lat))), dist: DIST_HOME, look: { x: 0, y: 0, z: 0 } });
     state.pausedUntil = performance.now() + 1400;
   }

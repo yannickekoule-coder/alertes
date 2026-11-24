@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-build="v4-3d">
+<html lang="fr" data-build="v4.1-mobile">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -82,11 +82,12 @@
     <button type="button" class="back-globe" id="back-globe" hidden>← Retour au globe</button>
     <div id="city-labels" aria-hidden="true"></div>
 
-    <div class="sheet" id="sheet">
-      <button type="button" class="sheet-handle" id="sheet-handle" aria-expanded="false" aria-controls="sheet-body">
+    <div class="sheet is-open" id="sheet">
+      <button type="button" class="sheet-handle" id="sheet-handle" aria-expanded="true" aria-controls="sheet-body">
         <span class="handle-bar" aria-hidden="true"></span>
         <span id="sheet-title">Fil d'alertes</span>
       </button>
+      <div class="sheet-counters counters" id="sheet-counters"></div>
       <div class="sheet-body" id="sheet-body">
         <div class="sheet-tabs">
           <button type="button" class="tab is-on" data-tab="feed">Fil</button>
@@ -101,7 +102,8 @@
       <span class="lg lg-info">Info</span>
       <span class="lg lg-watch">Vigilance</span>
       <span class="lg lg-danger">Danger</span>
-      <span class="hint">Le globe tourne seul — glisse, pince ou molette</span>
+      <span class="hint hint-full">Le globe tourne seul — glisse, pince ou molette</span>
+      <span class="hint hint-short">Glisse ou pince le globe</span>
     </p>
 
     <button type="button" class="skip" id="skip">Passer l'intro</button>
