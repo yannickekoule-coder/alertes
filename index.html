@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-build="v3-map">
+<html lang="fr" data-build="v4-3d">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -17,9 +17,12 @@
     <div id="map2d" hidden aria-hidden="true"></div>
     <div id="realmap" aria-hidden="true">
       <div id="realmap-canvas"></div>
-      <div class="map-tools" role="group" aria-label="Fond de carte">
+      <div class="map-tools" role="group" aria-label="Fond et vue de la carte">
         <button type="button" id="basemap-sat" class="is-on">Satellite</button>
         <button type="button" id="basemap-osm">Plan</button>
+        <span class="map-tools-sep" aria-hidden="true"></span>
+        <button type="button" id="view-2d">2D</button>
+        <button type="button" id="view-3d" class="is-on">3D</button>
       </div>
     </div>
 

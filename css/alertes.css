@@ -308,6 +308,7 @@ h1 {
   color: var(--muted); background: transparent; border: 0; padding: 7px 12px; cursor: pointer;
 }
 .map-tools button.is-on { color: var(--cyan); background: rgba(63,240,255,0.08); }
+.map-tools-sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
 
 .map-pulse {
   width: 28px; height: 28px; position: relative;
@@ -348,15 +349,23 @@ h1 {
 .map-pop .maplibregl-popup-content a { color: #3ff0ff; }
 .map-pop .maplibregl-popup-tip { border-top-color: rgba(4,10,16,0.92); }
 
+.map-links {
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+  margin: 0; padding: 0 8px 8px 52px;
+}
+.map-pop .map-links { padding: 0; margin-top: 6px; flex-direction: column; gap: 4px; }
 .gmaps {
   display: inline-block; margin-top: 5px;
   font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(63,240,255,0.35);
 }
+.map-links .gmaps { margin-top: 0; }
 .gmaps:hover { border-bottom-color: var(--cyan); }
 
 @media (max-width: 860px) {
   .map-tools { top: calc(76px + var(--safe-t)); }
+  .map-tools button { padding: 7px 9px; font-size: 9px; }
+  .map-links { padding-left: 52px; }
   #realmap .maplibregl-ctrl-bottom-left,
   #realmap .maplibregl-ctrl-bottom-right { bottom: calc(56px + var(--safe-b)); }
   #realmap .maplibregl-ctrl-attrib { max-width: 70%; }

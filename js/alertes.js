@@ -561,11 +561,21 @@
     return fn ? fn(a.lat, a.lon) : ("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.lat + "," + a.lon));
   }
 
+  function earthHref(a) {
+    if (!isFinite(a.lat) || !isFinite(a.lon)) return "";
+    const fn = window.ALERTES.mapview && window.ALERTES.mapview.earthUrl;
+    return fn ? fn(a.lat, a.lon) : ("https://earth.google.com/web/@" + a.lat + "," + a.lon + ",0a,800d,35y,0h,60t,0r");
+  }
+
   function cardHTML(a) {
     const sev = a.severity || "info";
     const href = mapsHref(a);
-    const link = href
-      ? '<a class="gmaps" href="' + href + '" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Maps</a>'
+    const earth = earthHref(a);
+    const links = (href || earth)
+      ? '<p class="map-links">' +
+        (href ? '<a class="gmaps" href="' + href + '" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Maps</a>' : "") +
+        (earth ? '<a class="gmaps" href="' + earth + '" target="_blank" rel="noopener noreferrer">Ouvrir dans Google Earth</a>' : "") +
+        "</p>"
       : "";
     return (
       '<div class="card sev-' + sev + '" role="listitem">' +
@@ -575,9 +585,9 @@
             '<p class="card-kicker">' + (a.typeLabel || "") + " · " + (sev === "danger" ? "Danger" : sev === "watch" ? "Vigilance" : "Info") + "</p>" +
             '<p class="card-title">' + escapeHtml(a.title) + "</p>" +
             '<p class="card-meta">' + escapeHtml(a.countryName || "") + (a.extra ? " · " + escapeHtml(a.extra) : "") + (a.time ? " · " + fmtWhen(a.time) : "") + "</p>" +
-            link +
           "</div>" +
         "</button>" +
+        links +
       "</div>"
     );
   }
@@ -701,7 +711,7 @@
     const list = pack ? pack.alerts : state.alerts.filter((a) => a.iso2 === iso2);
     const nCities = geo.citiesFor(iso2).length;
     body.innerHTML = "<h3>" + escapeHtml(name) + "</h3>" +
-      (nCities ? "<p class='tiny'>" + nCities + " ville" + (nCities > 1 ? "s" : "") + " principales — hauteur selon la population</p>" : "") +
+      (nCities ? "<p class='tiny'>" + nCities + " ville" + (nCities > 1 ? "s" : "") + " principales — vue 3D au sol (relief et bâtiments)</p>" : "") +
       (list.length ? "<div class='pop-feed'>" + list.map(cardHTML).join("") + "</div>"
         : "<p class='tiny'>Aucune alerte recensée pour ce pays aujourd'hui.</p>");
     pop.hidden = false;
@@ -1151,7 +1161,11 @@
 
     state.ready = true;
     window.__ALERTES_READY = true;
-    window.__ALERTES_FOCUS = (iso) => selectCountry(String(iso || "").toUpperCase());
+    window.__ALERTES_FOCUS = (iso, id) => selectCountry(String(iso || "").toUpperCase(), id);
+    window.__ALERTES_ALERTS = () => (state.alerts || []).map((a) => ({
+      id: a.id, iso2: a.iso2, lat: a.lat, lon: a.lon,
+      title: a.title, countryName: a.countryName, typeLabel: a.typeLabel, severity: a.severity
+    }));
     window.__ALERTES_MAP_ON = () => !!(window.ALERTES.mapview && window.ALERTES.mapview.isVisible());
   }
 
